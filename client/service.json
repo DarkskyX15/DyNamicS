@@ -5,17 +5,17 @@
     "target_ssid": "WIFI_SSID",
     "wifi_password": "wifi_password",
     "suda_config_path": "suda.json",
-    "scan_interval": 30.0,
-    "start_on_boot": true,
+    "scan_interval": 60.0,
+    "start_on_boot": false,
     "isp": "中国移动",
     "account": "account",
     "password": "password",
 
     "advanced_flags": {
-        "full_admin_mode": true,
+        "full_admin_mode": false,
         "interface_reboot": {
-            "enabled": true,
-            "interface": "以太网",
+            "enabled": false,
+            "interface": "EitherNet",
             "wait_duration": 10.0,
             "disable_cmd": "netsh interface set interface \"%s\" admin=disable",
             "enable_cmd": "netsh interface set interface \"%s\" admin=enable"
