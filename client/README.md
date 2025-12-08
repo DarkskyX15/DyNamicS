@@ -115,7 +115,7 @@ type: bool
 type: object
 
 是否在有线网络连接失败时尝试重启网卡？  
-**必须启用interface_reboot**
+**必须启用 full_admin_mode 选项**
 
 ```json
 {
