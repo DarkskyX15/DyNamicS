@@ -1,7 +1,8 @@
 
 # Client
 
-用于自动登录且定时上报IP至DyNamicS API的脚本。
+用于自动登录且定时上报IP至DyNamicS API的脚本。  
+**IP上报目前未实现**
 
 ## 如何使用
 
@@ -113,7 +114,8 @@ type: bool
 
 type: object
 
-是否在有线网络连接失败时尝试重启网卡？
+是否在有线网络连接失败时尝试重启网卡？  
+**必须启用interface_reboot**
 
 ```json
 {
