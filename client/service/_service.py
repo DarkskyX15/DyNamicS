@@ -1,13 +1,28 @@
 
 import os
+import sys
 import time
 import json
+import subprocess
 from queue import Queue, Empty
 from typing import Any, TypedDict
+
+from pysudo import sudo_check
 
 from ._suda import SudaLoginClient
 from ._wifi import scan_and_deduplicate_wifi, connect_to_wifi
 
+
+class InterfaceRebootFlags(TypedDict):
+    enabled: bool
+    wait_duration: bool
+    interface: str
+    enable_cmd: str
+    disable_cmd: str
+
+class AdvancedFlags(TypedDict):
+    full_admin_mode: bool
+    interface_reboot: InterfaceRebootFlags
 
 class ServiceConfig:
     api_url: str
@@ -21,6 +36,8 @@ class ServiceConfig:
     isp: str
     account: str
     password: str
+
+    advanced_flags: AdvancedFlags
 
 
     def __init__(self, path: str | None = None) -> None:
@@ -44,7 +61,17 @@ class ServiceConfig:
             "start_on_boot": True,
             "isp": "中国移动",
             "account": "your_account",
-            "password": "your_password"
+            "password": "your_password",
+            "advanced_flags": {
+                "full_admin_mode": False,
+                "interface_reboot": {
+                    "enabled": False,
+                    "interface": "EitherNet",
+                    "wait_duration": 10.0,
+                    "disable_cmd": "netsh interface set interface \"%s\" admin=disable",
+                    "enable_cmd": "netsh interface set interface \"%s\" admin=enable"
+                }
+            }
         }
         with open(path, "w", encoding="utf-8") as f:
             json.dump(c, f, ensure_ascii=False, indent=4)
@@ -74,6 +101,7 @@ class ServiceMessage(TypedDict):
     args: dict[str, Any]
 
 
+
 class Service:
 
     _tunnel: Queue[ServiceMessage | None]
@@ -94,6 +122,38 @@ class Service:
     def _save_config(self) -> None:
         self._config.save_config()
 
+
+    # Advanced Modes functions
+
+    def advanced_interface_reboot(self, cfg: InterfaceRebootFlags) -> bool:
+        if not sudo_check():
+            print(
+                "This feature requires admin privilege, consider setting"
+                " advanced flag 'full_admin_mode' to true."
+            )
+            return False
+    
+        interface = cfg["interface"]
+        enable_cmd = cfg["enable_cmd"] % (interface, )
+        disable_cmd = cfg["disable_cmd"] % (interface, )
+
+        try_count = 0
+
+        while try_count < 3 and not self._client.inet_available:
+            print(f"Disabling interface {interface}...")
+            subprocess.run(disable_cmd, shell=True)
+            time.sleep(cfg["wait_duration"])
+
+            print(f"Enabling interface {interface}...")
+            subprocess.run(enable_cmd, shell=True)
+            time.sleep(cfg["wait_duration"])
+
+            self._client.update_status()
+            try_count += 1
+
+        return self._client.inet_available
+    
+
     def _scan_once(self) -> None:
         self._client.update_status()
 
@@ -101,6 +161,10 @@ class Service:
 
             if not self._config.use_wifi:
                 print("Connection error with non-WiFi mode, service won't work properly.")
+
+                if self._config.advanced_flags["interface_reboot"]["enabled"]:
+                    print("Try rebooting network interface...")
+                    self.advanced_interface_reboot(self._config.advanced_flags["interface_reboot"])
                 return
 
             wifi_infos = scan_and_deduplicate_wifi(5)
@@ -152,7 +216,10 @@ class Service:
                     self._timestamp = time.time()
             finally:
                 time.sleep(1.0)
-            
+
+    def check_full_admin(self) -> bool:
+        return self._config.advanced_flags["full_admin_mode"]
+
 
     def save_config(self) -> None:
         self._tunnel.put({"type": "save", "args": {}})

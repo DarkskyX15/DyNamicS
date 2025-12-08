@@ -8,6 +8,17 @@
     "scan_interval": 30.0,
     "start_on_boot": true,
     "isp": "中国移动",
-    "account": "user_name",
-    "password": "password"
+    "account": "account",
+    "password": "password",
+
+    "advanced_flags": {
+        "full_admin_mode": true,
+        "interface_reboot": {
+            "enabled": true,
+            "interface": "以太网",
+            "wait_duration": 10.0,
+            "disable_cmd": "netsh interface set interface \"%s\" admin=disable",
+            "enable_cmd": "netsh interface set interface \"%s\" admin=enable"
+        }
+    }
 }
