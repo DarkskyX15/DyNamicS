@@ -1,0 +1,13 @@
+{
+    "api_url": "http://127.0.0.1/",
+    "api_token": "dns-xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "use_wifi": false,
+    "target_ssid": "WIFI_SSID",
+    "wifi_password": "wifi_password",
+    "suda_config_path": "suda.json",
+    "scan_interval": 30.0,
+    "start_on_boot": true,
+    "isp": "中国移动",
+    "account": "user_name",
+    "password": "password"
+}

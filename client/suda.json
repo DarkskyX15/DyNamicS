@@ -1,0 +1,19 @@
+{
+    "base_url": "http://10.9.1.3/",
+    "api_url": "http://10.9.1.3:801/eportal/",
+    "ip_regex": "v46?ip='([.0-9]+)'",
+    "login_sign": "v4ip",
+    "file_ver_regex": "var fileVersion=\"([0-9]+)\"",
+    "isp_url": "http://10.9.1.3:801/eportal/extern/SZDX/ip/3/pc.js?v=_%s",
+    "isp_regex": "<option.*? value=\"([-@a-z0-9]*)\".*?>(.*?)<\\/option>",
+    "login_params": {
+        "c": "Portal",
+        "a": "login", 
+        "login_method": "1",
+        "user_account": "{account}{isp_sign}",
+        "user_password": "{password}",
+        "wlan_user_ip": "{user_ip}",
+        "v": "{rand_num}"
+    },
+    "add_isp": {}
+}
