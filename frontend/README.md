@@ -18,6 +18,14 @@ npm install
 npm run dev
 ```
 
+开发服务器会将 `/api` 请求反向代理到本地后端 `http://127.0.0.1:8000`。
+
+联调时请先在 `backend/` 目录启动后端：
+
+```powershell
+..\.venv\Scripts\python.exe main.py
+```
+
 ## 构建
 
 ```powershell
