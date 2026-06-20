@@ -2,5 +2,7 @@
 .trash/
 .venv/
 .opencode/
+backend/dynamics.db
+frontend/pnpm-lock.yaml
 
 __pycache__/
