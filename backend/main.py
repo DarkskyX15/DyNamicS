@@ -1,4 +1,4 @@
-from backend.dynamics_backend import create_app
+from dynamics_backend import create_app
 
 
 app = create_app()

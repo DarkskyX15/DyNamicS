@@ -39,13 +39,19 @@
 
 ### 1. 后端
 
-使用仓库根目录下的 `.venv`：
+在 `backend/` 目录内运行后端，使用仓库根目录下的 `.venv`：
 
 ```powershell
-.\.venv\Scripts\python.exe backend\main.py
+..\.venv\Scripts\python.exe main.py
 ```
 
 默认监听 `http://127.0.0.1:8000`。
+
+也可以使用：
+
+```powershell
+..\.venv\Scripts\uvicorn.exe main:app --host 127.0.0.1 --port 8000
+```
 
 首次启动会自动初始化 `SQLite` 数据库，并创建默认管理员账号：
 
