@@ -1,8 +1,8 @@
 
 # Client
 
-用于自动登录且定时上报IP至DyNamicS API的脚本。  
-**IP上报目前未实现**
+用于自动登录校园网，并将当前主机/IP 或完整 URL 上报至 DyNamicS 更新接口的脚本。  
+当前仓库中的客户端登录与 IP 获取能力已经存在，但“自动上报到新后端”的代码仍需要进一步接入。
 
 ## 如何使用
 
@@ -64,8 +64,8 @@
 
 ```json
 {
-    "api_url": "http://127.0.0.1/",
-    "api_token": "dns-xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "api_url": "http://127.0.0.1:8000/api/update/by-token",
+    "api_token": "target-update-token",
     "use_wifi": false,
     "target_ssid": "WIFI_SSID",
     "wifi_password": "wifi_password",
@@ -89,8 +89,8 @@
 }
 ```
 
-- `api_url`: DyNamicS API接口的URL。
-- `api_token`: DyNamicS API接口的令牌，用于身份验证。
+- `api_url`: DyNamicS 更新 API 的基础 URL。推荐直接配置为 `/api/update/by-token` 的前缀。
+- `api_token`: target 更新令牌，由管理后台创建后仅展示一次。
 - `use_wifi`: 是否使用WiFi连接校园网。如果设置为`true`，则会在无网络连接时，尝试通过WiFi连接校园网。使用时必须先开启WiFi。
 - `target_ssid`: 目标SSID，即要连接的WiFi名称。
 - `wifi_password`: WiFi密码。
@@ -132,3 +132,40 @@ type: object
 - `wait_duration`: 操作网络接口的延时
 - `disable_cmd`: 禁用网络接口使用的命令
 - `enable_cmd`: 启用网络接口使用的命令
+
+## 与新后端的对接方式
+
+当前推荐的更新方式为：
+
+### 1. 管理后台创建一个 `dynamic_ip` target
+
+- 配置固定的 `scheme`、`port`、`base_path`
+- 为该 target 创建更新令牌
+
+### 2. 客户端获取当前 IP 后，调用：
+
+```http
+POST /api/update/by-token/<token>
+Content-Type: application/json
+
+{
+  "host": "1.2.3.4"
+}
+```
+
+### 3. 如果目标是 `dynamic_url` 模式，则调用：
+
+```http
+POST /api/update/by-token/<token>
+Content-Type: application/json
+
+{
+  "url": "https://1.2.3.4:8443/app"
+}
+```
+
+## 接入建议
+
+- 若当前客户端只知道校园网 IP，优先使用 `dynamic_ip` 模式
+- 若客户端能够直接确定完整访问地址，则使用 `dynamic_url` 模式
+- 更新令牌应视为敏感凭证，不应写入日志或公开分发
