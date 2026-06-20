@@ -1,5 +1,6 @@
 
 .trash/
 .venv/
+.opencode/
 
 __pycache__/
